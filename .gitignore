@@ -1,0 +1,16 @@
+# Личные настройки и секреты (вебхук!)
+config.json
+
+# Локальные данные скрипта
+rpc_stats.json
+rpc.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Редакторы
+.vscode/
+.idea/

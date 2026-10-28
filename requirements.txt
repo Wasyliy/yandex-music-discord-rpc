@@ -1,0 +1,13 @@
+# нужна свежая версия pypresence (поддержка ActivityType и StatusDisplayType)
+pypresence
+requests
+
+# чтение текущего трека из Windows (SMTC)
+winrt-runtime; sys_platform == "win32"
+winrt-Windows.Media.Control; sys_platform == "win32"
+winrt-Windows.Foundation; sys_platform == "win32"
+winrt-Windows.Foundation.Collections; sys_platform == "win32"
+winrt-Windows.Storage.Streams; sys_platform == "win32"
+
+# необязательно: экран «нагрузка ПК»
+psutil

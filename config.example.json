@@ -1,0 +1,30 @@
+{
+  "client_id": "ВСТАВЬТЕ_APPLICATION_ID",
+  "webhook_url": "",
+  "github_url": "https://github.com/Wasyliy",
+  "button_label": "GitHub",
+  "app_name": "My Status",
+  "source_hints": ["yandex"],
+  "fallback_cover": "cover",
+  "idle_decor": "༓ ♡ ༓",
+  "idle_large_text": "♡",
+  "timer_label": "В онлайне на протяжении:",
+  "cute_lines": [
+    "не забудь попить воды ✧",
+    "ты молодец ♡",
+    "пора размяться (っ◔◡◔)っ",
+    "улыбнись :3",
+    "розовое настроение ✿",
+    "⊂(・ω・⊂)"
+  ],
+  "moods": {
+    "morning": ["(｡•ᴗ•｡)", "доброе утро ✿"],
+    "day": ["٩(◕‿◕｡)۶", "день в разгаре ✧"],
+    "evening": ["(´｡• ω •｡`)", "вечерний режим ♡"],
+    "night": ["(｡-ω-)zzZ", "ночная сова ✧"]
+  },
+  "rotate_every": 60,
+  "grace": 8,
+  "min_interval": 5,
+  "poll": 2
+}
