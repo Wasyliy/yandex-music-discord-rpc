@@ -1,4 +1,7 @@
 # yandex-music-discord-rpc
+<img width="493" height="264" alt="image" src="https://github.com/user-attachments/assets/5295b0c8-2281-485b-8d72-196555307e6e" />
+<img width="510" height="290" alt="image" src="https://github.com/user-attachments/assets/8dba22cb-e95f-4241-a00e-677a22079f12" />
+
 
 Discord Rich Presence для Яндекс Музыки. Показывает, что ты слушаешь прямо сейчас, а когда музыки нет, крутит обычные статусы: сколько ты сегодня в сети, настроение по времени суток, загрузку ПК сердечками и прочее.
 
