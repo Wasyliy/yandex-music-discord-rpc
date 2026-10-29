@@ -72,32 +72,50 @@ DEFAULTS = {
 CONFIG_FILE = BASE_DIR / "config.json"
 
 
-def load_config():
+def read_config():
+    """Читает config.json поверх DEFAULTS. При ошибке бросает исключение."""
     cfg = dict(DEFAULTS)
-    try:
-        cfg.update(json.loads(CONFIG_FILE.read_text(encoding="utf-8")))
-    except FileNotFoundError:
-        print(f"Не найден {CONFIG_FILE}. Скопируйте config.example.json в config.json и заполните его.")
-        sys.exit(1)
-    except Exception as e:
-        print("Не удалось прочитать config.json:", e)
-        sys.exit(1)
+    cfg.update(json.loads(CONFIG_FILE.read_text(encoding="utf-8")))
     if not str(cfg["client_id"]).strip():
-        print("В config.json не указан client_id (Application ID из Discord Developer Portal).")
-        sys.exit(1)
+        raise ValueError("В config.json не указан client_id (Application ID из Discord Developer Portal).")
     return cfg
 
 
-CFG = load_config()
+def load_config():
+    """Первичная загрузка при старте: при ошибке выходим с понятным сообщением."""
+    try:
+        return read_config()
+    except FileNotFoundError:
+        print(f"Не найден {CONFIG_FILE}. Скопируйте config.example.json в config.json "
+              "или соберите его в config-editor.html.")
+    except Exception as e:
+        print("Не удалось прочитать config.json:", e)
+    sys.exit(1)
 
-CLIENT_ID = str(CFG["client_id"]).strip()
-WEBHOOK_URL = (CFG["webhook_url"] or "").strip()
-FALLBACK_COVER = CFG["fallback_cover"]
-SOURCE_HINTS = tuple(h.lower() for h in CFG["source_hints"])
-ROTATE_EVERY = CFG["rotate_every"]
-GRACE = CFG["grace"]
-MIN_INTERVAL = CFG["min_interval"]
-POLL = CFG["poll"]
+
+def apply_config(cfg):
+    """Применяет настройки. Вызывается при старте и при каждом изменении config.json."""
+    global CFG, CLIENT_ID, WEBHOOK_URL, FALLBACK_COVER, SOURCE_HINTS
+    global ROTATE_EVERY, GRACE, MIN_INTERVAL, POLL
+    CFG = cfg
+    CLIENT_ID = str(cfg["client_id"]).strip()
+    WEBHOOK_URL = (cfg["webhook_url"] or "").strip()
+    FALLBACK_COVER = cfg["fallback_cover"]
+    SOURCE_HINTS = tuple(h.lower() for h in cfg["source_hints"])
+    ROTATE_EVERY = cfg["rotate_every"]
+    GRACE = cfg["grace"]
+    MIN_INTERVAL = cfg["min_interval"]
+    POLL = cfg["poll"]
+
+
+def config_mtime():
+    try:
+        return CONFIG_FILE.stat().st_mtime
+    except OSError:
+        return None
+
+
+apply_config(load_config())
 
 SCRIPT_START = int(time.time())
 STATS_FILE = BASE_DIR / "rpc_stats.json"
@@ -409,6 +427,7 @@ async def main():
     last_music_ts, sent_raw = 0.0, None
     last_tick, last_saved = time.time(), time.time()
     track_id, track_listened, track_counted = None, 0.0, False
+    cfg_mtime = config_mtime()
 
     try:
         while True:
@@ -416,6 +435,21 @@ async def main():
                 now = time.time()
                 dt = min(now - last_tick, 10.0)
                 last_tick = now
+
+                # --- config.json изменился (например, сохранили из config-editor.html) ---
+                m = config_mtime()
+                if m and m != cfg_mtime:
+                    cfg_mtime = m
+                    try:
+                        old_id = CLIENT_ID
+                        apply_config(read_config())
+                        print("config.json перечитан")
+                        last_key = None                 # отправим статус заново
+                        if CLIENT_ID != old_id:         # сменили приложение — переподключаемся
+                            rpc.close()
+                            rpc = await connect_rpc()
+                    except Exception as e:
+                        print("config.json не удалось применить:", e)
 
                 cur = await get_current()
                 music = cur if (cur and cur["title"] and cur["playing"] and cur["duration"] > 0) else None

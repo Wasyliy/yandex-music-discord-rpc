@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Конструктор статуса ♡</title>
+<style>
+  :root {
+    --milk: #FFF6F9;
+    --paper: #FFFFFF;
+    --pink: #FFD3E3;
+    --pink-2: #FFE8F0;
+    --lilac: #E6DCFB;
+    --rose: #C23570;
+    --rose-ink: #FFFFFF;
+    --plum: #3B1F33;
+    --plum-2: #77566B;
+    --line: #F0C6D8;
+    --warn: #8F4F00;
+    --bad: #B3261E;
+    --ok: #1E6B49;
+    --font: ui-rounded, "SF Pro Rounded", "Nunito", "Quicksand", "Segoe UI Variable Text", "Segoe UI",
+            "Noto Sans", "Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Sans Lao", "Noto Sans Javanese",
+            "Noto Sans Balinese", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --milk: #241520;
+      --paper: #2F1D29;
+      --pink: #4A2A3E;
+      --pink-2: #3A2232;
+      --lilac: #3A3257;
+      --rose: #FF8DB8;
+      --rose-ink: #2A0F1D;
+      --plum: #FBE9F1;
+      --plum-2: #CDAEC0;
+      --line: #5A3A4E;
+      --warn: #FFC36B;
+      --bad: #FF9C94;
+      --ok: #7FD6A8;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { color-scheme: light dark; }
+  body {
+    margin: 0;
+    background: var(--milk);
+    color: var(--plum);
+    font: 16px/1.55 var(--font);
+  }
+  button { font: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--rose); outline-offset: 3px; }
+
+  /* ---------- шапка ---------- */
+  .top {
+    max-width: 1180px; margin: 0 auto; padding: 36px 24px 12px;
+    display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-end; justify-content: space-between;
+  }
+  h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.9rem); line-height: 1.05; font-weight: 800; letter-spacing: -0.02em; }
+  .sub { margin: 10px 0 0; color: var(--plum-2); max-width: 48ch; }
+  .tools { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    border: 0; border-radius: 999px; padding: 11px 20px; font-weight: 700;
+    background: var(--pink); color: var(--plum);
+  }
+  .btn:hover { filter: brightness(0.96); }
+  .btn.primary { background: var(--rose); color: var(--rose-ink); }
+  .btn.small { padding: 7px 14px; font-size: 0.9rem; }
+  .bar2 { max-width: 1180px; margin: 0 auto; padding: 0 24px 24px; }
+  .status { margin: 0; min-height: 1.6em; color: var(--plum-2); }
+  .status.ok { color: var(--ok); }
+  .status.bad { color: var(--bad); }
+  .compat { margin: 4px 0 0; color: var(--plum-2); font-size: 0.9rem; }
+
+  /* ---------- раскладка ---------- */
+  .layout {
+    max-width: 1180px; margin: 0 auto; padding: 8px 24px 80px;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(340px, 440px); gap: 48px;
+  }
+  .stage { position: sticky; top: 20px; align-self: start; }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 32px; }
+    .stage { position: static; order: -1; }
+  }
+
+  /* ---------- форма ---------- */
+  .sec { margin: 0 0 44px; }
+  .sec h2 { margin: 0 0 4px; font-size: 1.3rem; font-weight: 800; }
+  .sec .lead { margin: 0 0 18px; color: var(--plum-2); }
+  .field { margin: 0 0 18px; }
+  .lab { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin: 0 0 6px 4px; }
+  .lab label { font-weight: 700; font-size: 0.95rem; }
+  .cnt { font-size: 0.8rem; color: var(--plum-2); font-variant-numeric: tabular-nums; }
+  .cnt.near { color: var(--warn); }
+  .cnt.over { color: var(--bad); font-weight: 700; }
+  .hint { margin: 6px 0 0 4px; font-size: 0.88rem; color: var(--plum-2); max-width: 62ch; }
+  .pill {
+    width: 100%; border: 2px solid var(--line); background: var(--paper); color: var(--plum);
+    border-radius: 999px; padding: 10px 18px; font: inherit;
+  }
+  .pill::placeholder { color: var(--plum-2); opacity: 0.7; }
+  .pill:hover { border-color: var(--plum-2); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .two { grid-template-columns: 1fr; } }
+  .withbtn { display: flex; gap: 8px; align-items: center; }
+  .ghost { flex: none; border: 0; background: transparent; color: var(--rose); font-weight: 700; padding: 8px 10px; border-radius: 999px; }
+  .ghost:hover { background: var(--pink-2); }
+
+  .chips {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    border: 2px solid var(--line); background: var(--paper); border-radius: 24px; padding: 8px 12px;
+  }
+  .chips:focus-within { border-color: var(--rose); }
+  .chip { display: inline-flex; align-items: center; gap: 4px; background: var(--lilac); border-radius: 999px; padding: 3px 4px 3px 12px; }
+  .chip button { border: 0; background: transparent; color: inherit; width: 24px; height: 24px; border-radius: 50%; line-height: 1; }
+  .chip button:hover { background: var(--pink); }
+  .chips input { flex: 1; min-width: 8rem; border: 0; background: transparent; color: var(--plum); font: inherit; padding: 4px 2px; outline: none; }
+
+  .lines { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+  .lines li { display: flex; gap: 8px; align-items: center; }
+  .icon { flex: none; width: 38px; height: 38px; border: 0; border-radius: 50%; background: var(--pink-2); color: var(--plum); font-size: 1.1rem; line-height: 1; }
+  .icon:hover { background: var(--pink); }
+  .empty { margin: 0 0 12px 4px; color: var(--plum-2); }
+
+  .mood { display: grid; grid-template-columns: 5.5rem 9rem minmax(0, 1fr); gap: 10px; align-items: center; margin: 0 0 10px; }
+  .mood .when { display: grid; line-height: 1.2; padding-left: 4px; }
+  .mood .when small { color: var(--plum-2); }
+  @media (max-width: 640px) {
+    .mood { grid-template-columns: 1fr 1fr; }
+    .mood .when { grid-column: 1 / -1; }
+  }
+
+  /* ---------- сцена с предпросмотром ---------- */
+  .stage-box { background: var(--lilac); border-radius: 30px; padding: 22px; }
+  .stage-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 0 14px; }
+  .stage-head h2 { margin: 0; font-size: 1.15rem; font-weight: 800; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 16px; }
+  .tab {
+    border: 0; border-radius: 999px; padding: 6px 12px; font-size: 0.88rem; font-weight: 600;
+    background: var(--paper); color: var(--plum);
+  }
+  .tab:hover { background: var(--pink-2); }
+  .tab[aria-pressed="true"] { background: var(--rose); color: var(--rose-ink); }
+
+  .dcard {
+    --bg: #2B2D31; --fg: #F2F3F5; --mut: #B5BAC1; --btn: #4E5058; --btnfg: #FFFFFF; --green: #23A55A;
+    background: var(--bg); color: var(--fg); border-radius: 12px; padding: 16px;
+    font-family: "gg sans", "Noto Sans", "Segoe UI", "Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Sans Lao",
+                 "Noto Sans Javanese", "Noto Sans Balinese", system-ui, sans-serif;
+    font-size: 0.9rem; line-height: 1.35;
+  }
+  .dcard[data-theme="light"] { --bg: #F2F3F5; --fg: #060607; --mut: #4E5058; --btn: #DADCE0; --btnfg: #060607; --green: #1A7F46; }
+  .dkind { color: var(--mut); font-size: 0.8rem; font-weight: 600; margin: 0 0 12px; }
+  .drow { display: flex; gap: 14px; align-items: flex-start; }
+  .dart { flex: none; width: 88px; height: 88px; border-radius: 8px; overflow: hidden; background: #FFC4DA; }
+  .dart img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .dtext { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+  .d0 { font-weight: 700; }
+  .d1 { }
+  .d2 { color: var(--mut); }
+  .dtime { margin-top: 4px; display: flex; align-items: center; gap: 6px; font-variant-numeric: tabular-nums; }
+  .dtime.idle { color: var(--green); }
+  .dtime svg { width: 16px; height: 16px; flex: none; }
+  .progress { flex: 1; height: 4px; border-radius: 2px; background: var(--btn); overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--fg); }
+  .dbtns { display: grid; gap: 8px; margin-top: 14px; }
+  .dbtn {
+    background: var(--btn); color: var(--btnfg); text-align: center; border-radius: 4px; padding: 7px 10px;
+    font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .note { margin: 10px 2px 0; font-size: 0.88rem; color: var(--plum-2); }
+
+  .ctx { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 0; font-size: 0.9rem; }
+  .ctx:empty { display: none; }
+  .ctx input[type="range"] { accent-color: var(--rose); width: 160px; }
+  .cover-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 14px 0 0; }
+  .cover-row input { display: none; }
+
+  .issues { list-style: none; margin: 18px 0 0; padding: 0; display: grid; gap: 8px; font-size: 0.92rem; }
+  .issues li { padding-left: 4px; }
+  .issues .err b { color: var(--bad); }
+  .issues .warn b { color: var(--warn); }
+  .issues .fine b { color: var(--ok); }
+
+  details.jsonbox { margin: 18px 0 0; }
+  details.jsonbox summary { cursor: pointer; font-weight: 700; }
+  details.jsonbox pre {
+    margin: 10px 0; max-height: 280px; overflow: auto; background: var(--paper); border-radius: 14px; padding: 12px 14px;
+    font: 12px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>Конструктор статуса ♡</h1>
+    <p class="sub">Меняй тексты и настройки здесь, не трогая код. Сохрани файл рядом со скриптом, и статус обновится сам.</p>
+  </div>
+  <div class="tools">
+    <button class="btn" type="button" id="open">Открыть config.json</button>
+    <button class="btn primary" type="button" id="save">Сохранить</button>
+    <button class="btn" type="button" id="reset">Сбросить</button>
+    <input type="file" id="file" accept=".json,application/json" hidden>
+  </div>
+</header>
+<div class="bar2">
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <p class="compat" id="compat" hidden>В этом браузере файл скачивается, а не перезаписывается. Положи скачанный config.json рядом с yandex_rpc.py. В Chrome и Edge сохранение идёт прямо в файл.</p>
+</div>
+
+<main class="layout">
+  <form id="form" class="editor" autocomplete="off" onsubmit="return false">
+
+    <section class="sec" aria-labelledby="h-main">
+      <h2 id="h-main">Основное ✿</h2>
+      <p class="lead">Без Application ID скрипт не запустится. Остальное по желанию.</p>
+
+      <div class="field">
+        <div class="lab"><label for="f-client_id">Application ID</label></div>
+        <input class="pill" id="f-client_id" data-key="client_id" inputmode="numeric" spellcheck="false" placeholder="1234567890123456789">
+        <p class="hint">Discord Developer Portal → твоё приложение → General Information → Application ID.</p>
+      </div>
+
+      <div class="field">
+        <div class="lab"><label for="f-webhook_url">Вебхук для обложек</label></div>
+        <div class="withbtn">
+          <input class="pill" id="f-webhook_url" data-key="webhook_url" type="password" autocomplete="new-password" spellcheck="false" placeholder="https://discord.com/api/webhooks/…">
+          <button class="ghost" type="button" id="toggle-webhook" aria-pressed="false">Показать</button>
+        </div>
+        <p class="hint">Необязательно. Через него скрипт заливает обложки, которых нет в Deezer и iTunes. Ссылка остаётся в этом файле и в твоём браузере, никуда не отправляется. Не выкладывай её на GitHub.</p>
+      </div>
+
+      <div class="field">
+        <div class="lab"><label for="f-app_name">Название в обычном статусе</label><span class="cnt" data-cnt="app_name"></span></div>
+        <input class="pill" id="f-app_name" data-key="app_name" data-limit="128" data-screen="classic" spellcheck="false">
+        <p class="hint">Показывается как «Играет в …».</p>
+      </div>
+
+      <div class="two">
+        <div class="field">
+          <div class="lab"><label for="f-github_url">Ссылка кнопки</label></div>
+          <input class="pill" id="f-github_url" data-key="github_url" data-screen="classic" spellcheck="false" placeholder="https://github.com/ник">
+        </div>
+        <div class="field">
+          <div class="lab"><label for="f-button_label">Текст кнопки</label><span class="cnt" data-cnt="button_label"></span></div>
+          <input class="pill" id="f-button_label" data-key="button_label" data-limit="32" data-unit="chars" data-screen="classic" spellcheck="false">
+        </div>
+      </div>
+      <p class="hint" style="margin-top:-8px">Оставь ссылку пустой, и кнопки не будет. Свою кнопку ты в собственном профиле не видишь, её показывает только другим.</p>
+
+      <div class="field">
+        <div class="lab"><label for="hint-input">Как скрипт находит плеер</label></div>
+        <div class="chips" id="hints"></div>
+        <p class="hint">Слова из названия приложения с музыкой. Для Яндекс Музыки хватит «yandex». Если слушаешь в браузере, добавь его название, но тогда в статус может попасть и видео.</p>
+      </div>
+
+      <div class="field">
+        <div class="lab"><label for="f-fallback_cover">Запасная картинка</label></div>
+        <input class="pill" id="f-fallback_cover" data-key="fallback_cover" spellcheck="false">
+        <p class="hint">Ключ картинки из Developer Portal → Rich Presence → Art Assets. Показывается, когда обложку найти не удалось.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-idle">
+      <h2 id="h-idle">Обычный статус ♡</h2>
+      <p class="lead">Показывается, пока не играет музыка. Экраны сменяются по кругу.</p>
+
+      <div class="field">
+        <div class="lab"><label for="f-idle_decor">Декоративная строка</label><span class="cnt" data-cnt="idle_decor"></span></div>
+        <input class="pill" id="f-idle_decor" data-key="idle_decor" data-limit="128" data-screen="classic" spellcheck="false">
+      </div>
+      <div class="field">
+        <div class="lab"><label for="f-timer_label">Подпись перед таймером</label><span class="cnt" data-cnt="timer_label"></span></div>
+        <input class="pill" id="f-timer_label" data-key="timer_label" data-limit="128" data-screen="classic" spellcheck="false">
+        <p class="hint">Таймер идёт с запуска скрипта и виден только на экране «Классика».</p>
+      </div>
+      <div class="field">
+        <div class="lab"><label for="f-idle_large_text">Подсказка на картинке</label><span class="cnt" data-cnt="idle_large_text"></span></div>
+        <input class="pill" id="f-idle_large_text" data-key="idle_large_text" data-limit="128" data-screen="classic" spellcheck="false">
+        <p class="hint">Появляется, когда навести курсор на картинку в статусе.</p>
+      </div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-lines">
+      <h2 id="h-lines">Фразы ⊂(・ω・⊂)</h2>
+      <p class="lead">Экран «Напоминание» берёт по одной фразе из списка. Enter добавляет новую строку.</p>
+      <ul class="lines" id="lines"></ul>
+      <p class="empty" id="lines-empty" hidden>Список пуст, экран «Напоминание» не появится.</p>
+      <button class="btn small" type="button" id="add-line">Добавить фразу</button>
+    </section>
+
+    <section class="sec" aria-labelledby="h-mood">
+      <h2 id="h-mood">Настроение (｡•ᴗ•｡)</h2>
+      <p class="lead">Каомодзи и фраза для каждого времени суток. Если оба поля пустые, экран в это время не показывается.</p>
+      <div id="moods"></div>
+    </section>
+
+    <section class="sec" aria-labelledby="h-time">
+      <h2 id="h-time">Тайминги ✧</h2>
+      <p class="lead">Обычно их менять не нужно.</p>
+      <div class="two" id="timings"></div>
+    </section>
+  </form>
+
+  <aside class="stage" aria-label="Предпросмотр">
+    <div class="stage-box">
+      <div class="stage-head">
+        <h2>Так увидят в Discord</h2>
+        <button class="tab" type="button" id="theme" aria-pressed="false" aria-label="Светлая тема карточки">Светлая</button>
+      </div>
+      <div class="tabs" id="tabs" role="group" aria-label="Экран для предпросмотра"></div>
+
+      <div class="dcard" id="card" data-theme="dark"></div>
+      <p class="note" id="note" hidden></p>
+      <div class="ctx" id="ctx"></div>
+
+      <div class="cover-row">
+        <button class="btn small" type="button" id="cover-btn">Примерить свою обложку</button>
+        <button class="btn small" type="button" id="cover-clear" hidden>Убрать</button>
+        <input type="file" id="cover-file" accept="image/*">
+      </div>
+      <p class="note">Картинка нужна только для предпросмотра и нигде не сохраняется. В Discord берётся ассет из поля «Запасная картинка».</p>
+
+      <ul class="issues" id="issues" aria-live="polite"></ul>
+
+      <details class="jsonbox">
+        <summary>Посмотреть config.json</summary>
+        <pre id="json" tabindex="0"></pre>
+        <button class="btn small" type="button" id="copy">Скопировать JSON</button>
+        <p class="note">В просмотре вебхук скрыт, в скопированный текст попадает целиком.</p>
+      </details>
+    </div>
+  </aside>
+</main>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- значения по умолчанию (как в yandex_rpc.py) ---------- */
+  const DEFAULTS = {
+    client_id: '',
+    webhook_url: '',
+    github_url: '',
+    button_label: 'GitHub',
+    app_name: 'My Status',
+    source_hints: ['yandex'],
+    fallback_cover: 'cover',
+    idle_decor: '༓ ♡ ༓',
+    idle_large_text: '♡',
+    timer_label: 'В онлайне на протяжении:',
+    cute_lines: [
+      'не забудь попить воды ✧',
+      'ты молодец ♡',
+      'пора размяться (っ◔◡◔)っ',
+      'улыбнись :3',
+      'розовое настроение ✿',
+      '⊂(・ω・⊂)'
+    ],
+    moods: {
+      morning: ['(｡•ᴗ•｡)', 'доброе утро ✿'],
+      day: ['٩(◕‿◕｡)۶', 'день в разгаре ✧'],
+      evening: ['(´｡• ω •｡`)', 'вечерний режим ♡'],
+      night: ['(｡-ω-)zzZ', 'ночная сова ✧']
+    },
+    rotate_every: 60,
+    grace: 8,
+    min_interval: 5,
+    poll: 2
+  };
+  const KEY_ORDER = Object.keys(DEFAULTS);
+
+  const MOODS = [
+    ['morning', 'Утро', '6–11'],
+    ['day', 'День', '11–18'],
+    ['evening', 'Вечер', '18–23'],
+    ['night', 'Ночь', '23–6']
+  ];
+
+  const TIMINGS = [
+    ['rotate_every', 'Смена экрана', 15, 600, 5, 'Как часто обычный статус переключается на следующий экран.'],
+    ['grace', 'Ожидание после паузы', 3, 60, 1, 'Сколько ждать при паузе или смене трека, прежде чем вернуть обычный статус.'],
+    ['min_interval', 'Пауза между обновлениями', 4, 60, 1, 'Минимум между отправками в Discord. Меньше 4 секунд лучше не ставить: Discord может пропускать обновления.'],
+    ['poll', 'Опрос плеера', 1, 10, 1, 'Как часто скрипт спрашивает у Windows, что сейчас играет.']
+  ];
+
+  const SCREENS = [
+    ['classic', 'Классика'],
+    ['stats', 'Статистика'],
+    ['toptrack', 'Трек дня'],
+    ['topartist', 'Артист недели'],
+    ['streak', 'Серия'],
+    ['mood', 'Настроение'],
+    ['pc', 'Мой ПК'],
+    ['cute', 'Напоминание'],
+    ['music', 'Музыка']
+  ];
+
+  const DEMO = {
+    online: 134 * 60, listen: 108 * 60, tracks: 12,
+    top: ['Название трека', 'Артист', 4], artist: ['Артист', 9], streak: 5,
+    music: { title: 'Название трека', artist: 'Артист', album: 'Альбом', pos: 72, dur: 228 }
+  };
+
+  const COVER_SVG = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='#FFC4DA'/>" +
+    "<path d='M50 82 C18 58 14 32 33 28 C42 26 48 32 50 38 C52 32 58 26 67 28 C86 32 82 58 50 82Z' fill='#C23570'/></svg>");
+  const PAD_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 8h12a4 4 0 0 1 4 4v1a3 3 0 0 1-5.2 2L15 13H9l-1.8 2A3 3 0 0 1 2 13v-1a4 4 0 0 1 4-4z"/></svg>';
+
+  /* ---------- утилиты ---------- */
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clone = o => JSON.parse(JSON.stringify(o));
+  const enc = new TextEncoder();
+  const bytes = s => enc.encode(s).length;
+  const chars = s => [...s].length;
+
+  function el(tag, props = {}, ...kids) {
+    const n = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (v === false || v == null) continue;
+      if (k === 'class') n.className = v;
+      else if (k.startsWith('on')) n.addEventListener(k.slice(2), v);
+      else n.setAttribute(k, v === true ? '' : v);
+    }
+    for (const kid of kids.flat()) if (kid != null) n.append(kid);
+    return n;
+  }
+
+  // округление как в Python (до ближайшего чётного при .5), чтобы сердечки совпадали со скриптом
+  function pyRound(x) {
+    const f = Math.floor(x), d = x - f;
+    if (d === 0.5) return f % 2 === 0 ? f : f + 1;
+    return Math.round(x);
+  }
+  const hearts = (frac, n = 5) => {
+    const full = pyRound(Math.max(0, Math.min(1, frac)) * n);
+    return '♥'.repeat(full) + '♡'.repeat(n - full);
+  };
+  const fmtDur = sec => {
+    const m = Math.floor(sec / 60), h = Math.floor(m / 60);
+    return h ? `${h}ч ${m % 60}м` : `${m}м`;
+  };
+  const fmtClock = sec => {
+    sec = Math.floor(sec);
+    const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    const mm = String(m).padStart(h ? 2 : 1, '0'), ss = String(s).padStart(2, '0');
+    return h ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+  };
+  const moodKeyForHour = h => (h >= 6 && h < 11) ? 'morning' : (h >= 11 && h < 18) ? 'day' : (h >= 18 && h < 23) ? 'evening' : 'night';
+
+  /* ---------- состояние ---------- */
+  let state = clone(DEFAULTS);
+  let extra = {};            // неизвестные ключи из загруженного файла сохраняются как есть
+  let handle = null;         // дескриптор файла (Chrome/Edge)
+  let dirty = false;
+  const view = { screen: 'classic', mood: moodKeyForHour(new Date().getHours()), cpu: 34, line: 0, theme: 'dark', cover: null };
+  const t0 = Date.now();
+
+  function applyLoaded(obj) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) {
+      throw new Error('Файл не похож на config.json: ожидается объект JSON.');
+    }
+    const next = clone(DEFAULTS), ex = {};
+    for (const [k, v] of Object.entries(obj)) {
+      if (!(k in DEFAULTS)) { ex[k] = v; continue; }
+      const d = DEFAULTS[k];
+      if (typeof d === 'string') next[k] = v == null ? '' : String(v);
+      else if (typeof d === 'number') { const n = Number(v); if (Number.isFinite(n)) next[k] = n; }
+      else if (k === 'cute_lines') { if (Array.isArray(v)) next[k] = v.map(String); }
+      else if (k === 'source_hints') next[k] = Array.isArray(v) ? v.map(String) : String(v).split(',').map(s => s.trim()).filter(Boolean);
+      else if (k === 'moods' && v && typeof v === 'object') {
+        for (const [mk] of MOODS) {
+          const m = v[mk];
+          if (Array.isArray(m)) next.moods[mk] = [String(m[0] ?? ''), String(m[1] ?? '')];
+        }
+      }
+    }
+    state = next; extra = ex;
+  }
+
+  function buildConfig() {
+    const c = state, out = {};
+    for (const k of KEY_ORDER) {
+      if (k === 'cute_lines') out[k] = c.cute_lines.filter(s => s.trim() !== '');
+      else if (k === 'source_hints') out[k] = c.source_hints.slice();
+      else if (k === 'moods') out[k] = clone(c.moods);
+      else out[k] = c[k];
+    }
+    return Object.assign(out, extra);
+  }
+  function toJson(masked) {
+    const cfg = buildConfig();
+    if (masked && cfg.webhook_url) cfg.webhook_url = '(скрыто)';
+    return JSON.stringify(cfg, null, 2) + '\n';
+  }
+
+  /* ---------- статус ---------- */
+  const statusEl = $('#status');
+  function setStatus(text, tone) {
+    statusEl.textContent = text;
+    statusEl.className = 'status' + (tone ? ' ' + tone : '');
+  }
+  function baseStatus() {
+    if (dirty) return setStatus('Есть несохранённые изменения.');
+    if (handle) return setStatus('Файл: ' + handle.name);
+    setStatus('Открой существующий config.json или заполни поля и нажми «Сохранить».');
+  }
+  function touch() {
+    dirty = true;
+    baseStatus();
+    render();
+  }
+
+  /* ---------- статические поля ---------- */
+  function syncInputs() {
+    $$('[data-key]').forEach(inp => { inp.value = state[inp.dataset.key] ?? ''; });
+  }
+  $$('[data-key]').forEach(inp => inp.addEventListener('input', () => { state[inp.dataset.key] = inp.value; touch(); }));
+  $$('[data-screen]').forEach(inp => inp.addEventListener('focus', () => setScreen(inp.dataset.screen)));
+
+  $('#toggle-webhook').addEventListener('click', e => {
+    const inp = $('#f-webhook_url'), show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    e.currentTarget.textContent = show ? 'Скрыть' : 'Показать';
+    e.currentTarget.setAttribute('aria-pressed', String(show));
+  });
+
+  /* ---------- динамические поля ---------- */
+  function renderChips(focusInput) {
+    const box = $('#hints');
+    box.textContent = '';
+    state.source_hints.forEach((h, i) => {
+      box.append(el('span', { class: 'chip' }, h,
+        el('button', { type: 'button', 'aria-label': 'Убрать ' + h, onclick: () => { state.source_hints.splice(i, 1); renderChips(true); touch(); } }, '×')));
+    });
+    const input = el('input', { type: 'text', id: 'hint-input', spellcheck: 'false', placeholder: state.source_hints.length ? 'ещё слово' : 'yandex' });
+    const add = () => {
+      const v = input.value.trim().toLowerCase();
+      if (!v) return;
+      if (!state.source_hints.includes(v)) state.source_hints.push(v);
+      renderChips(true); touch();
+    };
+    input.addEventListener('keydown', e => {
+      if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) { e.preventDefault(); add(); }
+      else if (e.key === 'Backspace' && !input.value && state.source_hints.length) { state.source_hints.pop(); renderChips(true); touch(); }
+    });
+    input.addEventListener('change', add);
+    box.append(input);
+    if (focusInput) input.focus();
+  }
+
+  function renderLines(focusIdx) {
+    const ul = $('#lines');
+    ul.textContent = '';
+    state.cute_lines.forEach((t, i) => {
+      const inp = el('input', { class: 'pill', type: 'text', value: t, spellcheck: 'false', 'aria-label': 'Фраза ' + (i + 1) });
+      inp.addEventListener('input', () => { state.cute_lines[i] = inp.value; view.line = i; touch(); });
+      inp.addEventListener('focus', () => { view.line = i; setScreen('cute'); });
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter') { e.preventDefault(); state.cute_lines.splice(i + 1, 0, ''); renderLines(i + 1); touch(); }
+      });
+      ul.append(el('li', {}, inp,
+        el('button', { type: 'button', class: 'icon', 'aria-label': 'Удалить фразу ' + (i + 1), onclick: () => { state.cute_lines.splice(i, 1); renderLines(); touch(); } }, '×')));
+      if (focusIdx === i) setTimeout(() => inp.focus());
+    });
+    $('#lines-empty').hidden = state.cute_lines.length > 0;
+  }
+  $('#add-line').addEventListener('click', () => { state.cute_lines.push(''); renderLines(state.cute_lines.length - 1); touch(); });
+
+  function renderMoods() {
+    const box = $('#moods');
+    box.textContent = '';
+    MOODS.forEach(([k, name, range]) => {
+      const face = el('input', { class: 'pill', type: 'text', value: state.moods[k][0], spellcheck: 'false', 'aria-label': name + ': каомодзи' });
+      const text = el('input', { class: 'pill', type: 'text', value: state.moods[k][1], spellcheck: 'false', 'aria-label': name + ': фраза' });
+      face.addEventListener('input', () => { state.moods[k][0] = face.value; touch(); });
+      text.addEventListener('input', () => { state.moods[k][1] = text.value; touch(); });
+      const row = el('div', { class: 'mood' }, el('span', { class: 'when' }, el('b', {}, name), el('small', {}, range)), face, text);
+      row.addEventListener('focusin', () => { view.mood = k; setScreen('mood'); });
+      box.append(row);
+    });
+  }
+
+  function renderTimings() {
+    const box = $('#timings');
+    box.textContent = '';
+    TIMINGS.forEach(([k, name, min, max, step, hint]) => {
+      const id = 't-' + k;
+      const inp = el('input', { class: 'pill', id, type: 'number', min, max, step, value: state[k], inputmode: 'numeric' });
+      inp.addEventListener('input', () => {
+        if (inp.value === '') return;
+        const n = Number(inp.value);
+        if (Number.isFinite(n)) { state[k] = n; touch(); }
+      });
+      inp.addEventListener('change', () => {
+        const n = Math.min(max, Math.max(min, Number(inp.value) || min));
+        inp.value = n; state[k] = n; touch();
+      });
+      box.append(el('div', { class: 'field' },
+        el('div', { class: 'lab' }, el('label', { for: id }, name + ', сек')), inp, el('p', { class: 'hint' }, hint)));
+    });
+  }
+
+  function rebuild() {
+    syncInputs(); renderChips(); renderLines(); renderMoods(); renderTimings(); render();
+  }
+
+  /* ---------- предпросмотр ---------- */
+  function setScreen(s) {
+    view.screen = s;
+    renderTabs(); renderCtx(); renderCard();
+  }
+
+  function renderTabs() {
+    const box = $('#tabs');
+    box.textContent = '';
+    SCREENS.forEach(([id, name]) => {
+      box.append(el('button', { type: 'button', class: 'tab', 'aria-pressed': String(view.screen === id), onclick: () => setScreen(id) }, name));
+    });
+  }
+
+  function renderCtx() {
+    const box = $('#ctx');
+    box.textContent = '';
+    if (view.screen === 'mood') {
+      MOODS.forEach(([k, name]) => box.append(el('button', {
+        type: 'button', class: 'tab', 'aria-pressed': String(view.mood === k),
+        onclick: () => { view.mood = k; renderCtx(); renderCard(); }
+      }, name)));
+    } else if (view.screen === 'pc') {
+      const out = el('output', { id: 'cpu-out', for: 'cpu' }, view.cpu + '%');
+      const range = el('input', { type: 'range', id: 'cpu', min: 0, max: 100, step: 1, value: view.cpu });
+      range.addEventListener('input', () => { view.cpu = Number(range.value); out.textContent = view.cpu + '%'; renderCard(); });
+      box.append(el('label', { for: 'cpu' }, 'Загрузка CPU'), range, out);
+    } else if (view.screen === 'cute') {
+      box.append(el('button', {
+        type: 'button', class: 'tab',
+        onclick: () => { view.line = (view.line + 1) % Math.max(1, state.cute_lines.length); renderCard(); }
+      }, 'Другая фраза'));
+    }
+  }
+
+  function screenData() {
+    const c = state;
+    switch (view.screen) {
+      case 'classic':
+        return { kind: 'idle', d1: c.idle_decor, d2: c.timer_label, timer: true };
+      case 'stats':
+        return { kind: 'idle', d1: `✧ сегодня в сети: ${fmtDur(DEMO.online)}`, d2: `♫ треков: ${DEMO.tracks} · музыки: ${fmtDur(DEMO.listen)}` };
+      case 'toptrack':
+        return { kind: 'idle', d1: `♡ трек дня: ${DEMO.top[0]}`, d2: `${DEMO.top[1]} · ×${DEMO.top[2]}` };
+      case 'topartist':
+        return { kind: 'idle', d1: '✿ артист недели', d2: `${DEMO.artist[0]} · ×${DEMO.artist[1]}` };
+      case 'streak':
+        return { kind: 'idle', d1: `♡ на связи ${DEMO.streak} дн. подряд`, d2: 'серия не прерывается ✧' };
+      case 'mood': {
+        const [face, text] = c.moods[view.mood];
+        const line = `${face} ${text}`.trim();
+        return { kind: 'idle', d1: line || '…', d2: 'настроение сейчас', skip: !face && !text ? 'Каомодзи и фраза пустые, поэтому экран в это время не покажется.' : '' };
+      }
+      case 'pc': {
+        const cpu = view.cpu;
+        const vibe = cpu < 20 ? 'отдыхает' : cpu < 60 ? 'работает' : 'старается изо всех сил';
+        return { kind: 'idle', d1: `✿ мой пк ${vibe}`, d2: `${hearts(cpu / 100)} · CPU ${cpu}%`, skip: 'Экран появится, если на компьютере установлен psutil (pip install psutil).' };
+      }
+      case 'cute': {
+        const lines = c.cute_lines.filter(s => s.trim() !== '');
+        const line = lines.length ? lines[view.line % lines.length] : '…';
+        return { kind: 'idle', d1: '༓ мини-напоминание ༓', d2: line, skip: lines.length ? '' : 'Список фраз пуст, поэтому экран не покажется.' };
+      }
+      case 'music':
+      default:
+        return { kind: 'music', d0: DEMO.music.title, d1: DEMO.music.artist, d2: DEMO.music.album };
+    }
+  }
+
+  function renderCard() {
+    const s = screenData(), c = state;
+    const card = $('#card');
+    card.dataset.theme = view.theme;
+    card.textContent = '';
+
+    const art = el('div', { class: 'dart' }, el('img', { src: view.cover || COVER_SVG, alt: '' }));
+    const text = el('div', { class: 'dtext' });
+    let kind;
+
+    if (s.kind === 'music') {
+      kind = 'Слушает Яндекс Музыка';
+      text.append(el('div', { class: 'd0' }, s.d0), el('div', { class: 'd1' }, s.d1), el('div', { class: 'd2' }, s.d2),
+        el('div', { class: 'dtime' }, el('span', { id: 'pos' }, '0:00'), el('div', { class: 'progress' }, el('i', { id: 'fill' })), el('span', {}, fmtClock(DEMO.music.dur))));
+    } else {
+      kind = 'Играет в';
+      text.append(el('div', { class: 'd0' }, c.app_name || '…'), el('div', { class: 'd1' }, s.d1), el('div', { class: 'd2' }, s.d2));
+      if (s.timer) {
+        const t = el('div', { class: 'dtime idle' }, el('span', { id: 'elapsed' }, '0:00'));
+        t.insertAdjacentHTML('afterbegin', PAD_SVG);
+        text.append(t);
+      }
+    }
+
+    card.append(el('div', { class: 'dkind' }, kind), el('div', { class: 'drow' }, art, text));
+
+    const btns = [];
+    if (s.kind === 'music') btns.push('Найти в Яндекс Музыке');
+    if (c.github_url.trim()) btns.push(c.button_label || '(нет текста)');
+    if (btns.length) card.append(el('div', { class: 'dbtns' }, btns.map(b => el('div', { class: 'dbtn' }, b))));
+
+    const note = $('#note');
+    note.hidden = !s.skip;
+    note.textContent = s.skip || '';
+    tick();
+  }
+
+  function tick() {
+    const sec = (Date.now() - t0) / 1000;
+    const e = $('#elapsed');
+    if (e) e.textContent = fmtClock(3725 + sec);
+    const p = $('#pos'), f = $('#fill');
+    if (p && f) {
+      const pos = (DEMO.music.pos + sec) % DEMO.music.dur;
+      p.textContent = fmtClock(pos);
+      f.style.width = (pos / DEMO.music.dur * 100).toFixed(1) + '%';
+    }
+  }
+  setInterval(tick, 1000);
+
+  $('#theme').addEventListener('click', e => {
+    view.theme = view.theme === 'dark' ? 'light' : 'dark';
+    e.currentTarget.textContent = view.theme === 'dark' ? 'Светлая' : 'Тёмная';
+    e.currentTarget.setAttribute('aria-label', view.theme === 'dark' ? 'Светлая тема карточки' : 'Тёмная тема карточки');
+    e.currentTarget.setAttribute('aria-pressed', String(view.theme === 'light'));
+    renderCard();
+  });
+
+  const coverFile = $('#cover-file');
+  $('#cover-btn').addEventListener('click', () => coverFile.click());
+  coverFile.addEventListener('change', () => {
+    const f = coverFile.files[0];
+    if (!f) return;
+    if (view.cover) URL.revokeObjectURL(view.cover);
+    view.cover = URL.createObjectURL(f);
+    $('#cover-clear').hidden = false;
+    renderCard();
+  });
+  $('#cover-clear').addEventListener('click', () => {
+    if (view.cover) URL.revokeObjectURL(view.cover);
+    view.cover = null; coverFile.value = '';
+    $('#cover-clear').hidden = true;
+    renderCard();
+  });
+
+  /* ---------- проверки ---------- */
+  function validate() {
+    const out = [], c = state;
+    const add = (lvl, msg) => out.push({ lvl, msg });
+    const tooLong = (name, s) => {
+      const b = bytes(s);
+      if (b > 128) add('err', `«${name}»: ${b} из 128 байт. Кириллица и декоративные символы занимают 2–3 байта каждый.`);
+    };
+    const tooShort = (name, s) => {
+      if (chars(s.trim()) < 2) add('err', `«${name}»: нужно минимум 2 символа, иначе Discord отклонит статус.`);
+    };
+
+    if (!c.client_id.trim()) add('err', 'Application ID пустой. Без него скрипт не запустится.');
+    else if (!/^\d{17,20}$/.test(c.client_id.trim())) add('warn', 'Application ID обычно состоит из 17–20 цифр. Проверь, что скопирован именно он.');
+
+    if (c.webhook_url.trim() && !/^https:\/\/(?:(?:ptb|canary)\.)?discord(?:app)?\.com\/api\/webhooks\/\d+\/[\w-]+\/?$/.test(c.webhook_url.trim()))
+      add('warn', 'Ссылка вебхука не похожа на адрес Discord-вебхука.');
+
+    if (!c.app_name.trim()) add('err', 'Название в обычном статусе пустое.');
+    else tooLong('Название в обычном статусе', c.app_name);
+
+    if (c.github_url.trim()) {
+      if (!/^https?:\/\//i.test(c.github_url.trim())) add('err', 'Ссылка кнопки должна начинаться с https://.');
+      if (!c.button_label.trim()) add('err', 'У кнопки нет текста.');
+      else if (chars(c.button_label) > 32) add('err', 'Текст кнопки длиннее 32 символов.');
+    }
+
+    if (!c.source_hints.length) add('err', 'Не указано ни одного слова для поиска плеера: скрипт не найдёт Яндекс Музыку.');
+    if (!c.fallback_cover.trim()) add('warn', 'Запасная картинка не указана: без неё обычный статус останется без картинки.');
+
+    tooShort('Декоративная строка', c.idle_decor); tooLong('Декоративная строка', c.idle_decor);
+    tooShort('Подпись перед таймером', c.timer_label); tooLong('Подпись перед таймером', c.timer_label);
+    tooLong('Подсказка на картинке', c.idle_large_text);
+
+    c.cute_lines.forEach((s, i) => {
+      if (!s.trim()) return;
+      if (chars(s.trim()) < 2) add('err', `Фраза ${i + 1}: нужно минимум 2 символа.`);
+      tooLong('Фраза ' + (i + 1), s);
+    });
+    MOODS.forEach(([k, name]) => {
+      const line = `${c.moods[k][0]} ${c.moods[k][1]}`.trim();
+      if (line) { if (chars(line) < 2) add('err', `Настроение «${name}»: нужно минимум 2 символа.`); tooLong('Настроение «' + name + '»', line); }
+    });
+
+    if (c.min_interval < 4) add('warn', 'Пауза между обновлениями меньше 4 секунд: Discord может пропускать часть обновлений.');
+    if (c.rotate_every < c.min_interval) add('warn', 'Экраны меняются чаще, чем скрипт отправляет обновления. Увеличь смену экрана.');
+    return out;
+  }
+
+  function renderIssues() {
+    const ul = $('#issues');
+    ul.textContent = '';
+    const list = validate();
+    if (!list.length) { ul.append(el('li', { class: 'fine' }, el('b', {}, 'Всё в порядке. '), 'Можно сохранять ✿')); return; }
+    list.forEach(i => ul.append(el('li', { class: i.lvl }, el('b', {}, i.lvl === 'err' ? 'Нужно исправить: ' : 'Проверь: '), i.msg)));
+  }
+
+  function updateCounters() {
+    $$('[data-cnt]').forEach(span => {
+      const key = span.dataset.cnt, inp = $(`[data-key="${key}"]`);
+      const limit = Number(inp.dataset.limit), inChars = inp.dataset.unit === 'chars';
+      const n = inChars ? chars(state[key]) : bytes(state[key]);
+      span.textContent = `${n}/${limit}${inChars ? '' : ' байт'}`;
+      span.className = 'cnt' + (n > limit ? ' over' : n > limit * 0.8 ? ' near' : '');
+    });
+  }
+
+  function render() {
+    renderCard(); updateCounters(); renderIssues();
+    $('#json').textContent = toJson(true);
+  }
+
+  /* ---------- файлы ---------- */
+  const PICK_TYPES = [{ description: 'JSON', accept: { 'application/json': ['.json'] } }];
+  const hasFS = 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;
+  if (!hasFS) $('#compat').hidden = false;
+
+  function loadText(text, h) {
+    let obj;
+    // Application ID бывает записан числом: заключаем его в кавычки до разбора, иначе JavaScript обрежет последние цифры
+    const idRe = /("client_id"\s*:\s*)(\d{15,})/;
+    const numericId = idRe.test(text);
+    text = text.replace(idRe, '$1"$2"');
+    try { obj = JSON.parse(text); } catch (e) { return setStatus('Не получилось прочитать файл: это не JSON (' + e.message + ').', 'bad'); }
+    try {
+      applyLoaded(obj);
+      handle = h || null;
+      dirty = false;
+      rebuild();
+      setStatus('Открыто: ' + (h ? h.name : 'config.json') + (numericId ? '. Application ID был записан числом, при сохранении он станет строкой в кавычках.' : ''), 'ok');
+    } catch (e) { setStatus(e.message, 'bad'); }
+  }
+
+  $('#open').addEventListener('click', async () => {
+    if (hasFS) {
+      try {
+        const [h] = await window.showOpenFilePicker({ types: PICK_TYPES });
+        loadText(await (await h.getFile()).text(), h);
+        return;
+      } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    $('#file').click();
+  });
+  $('#file').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if (f) loadText(await f.text(), null);
+    e.target.value = '';
+  });
+
+  function download(text) {
+    const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }));
+    const a = el('a', { href: url, download: 'config.json' });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  $('#save').addEventListener('click', async () => {
+    const text = toJson(false);
+    try {
+      if (hasFS) {
+        if (!handle) handle = await window.showSaveFilePicker({ suggestedName: 'config.json', types: PICK_TYPES });
+        const w = await handle.createWritable();
+        await w.write(text);
+        await w.close();
+        dirty = false;
+        setStatus('Сохранено: ' + handle.name + '. Скрипт подхватит изменения за пару секунд.', 'ok');
+      } else {
+        download(text);
+        dirty = false;
+        setStatus('Файл config.json скачан. Положи его рядом с yandex_rpc.py.', 'ok');
+      }
+    } catch (e) {
+      if (e.name === 'AbortError') return;
+      setStatus('Не получилось сохранить: ' + e.message, 'bad');
+    }
+  });
+
+  $('#reset').addEventListener('click', () => {
+    if (!confirm('Сбросить все поля к значениям по умолчанию? Несохранённые изменения пропадут.')) return;
+    state = clone(DEFAULTS); extra = {};
+    dirty = true;
+    rebuild(); baseStatus();
+  });
+
+  $('#copy').addEventListener('click', async e => {
+    const btn = e.currentTarget, text = toJson(false);
+    try { await navigator.clipboard.writeText(text); }
+    catch {
+      const ta = el('textarea', { class: 'sr' }); ta.value = text; document.body.append(ta); ta.select();
+      try { document.execCommand('copy'); } catch {}
+      ta.remove();
+    }
+    btn.textContent = 'Скопировано';
+    setTimeout(() => { btn.textContent = 'Скопировать JSON'; }, 1500);
+  });
+
+  window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+
+  /* ---------- старт ---------- */
+  renderTabs(); renderCtx();
+  rebuild();
+  baseStatus();
+})();
+</script>
+</body>
+</html>
